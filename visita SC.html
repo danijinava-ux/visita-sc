@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visita del Superintendente de Circuito</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="data.js"></script>
+    <script>
+        window.onload = () => {
+            const navLinks = document.querySelectorAll('nav a');
+            const sections = document.querySelectorAll('section');
+
+            const showSection = (targetId) => {
+                sections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.remove('hidden');
+                        section.classList.add('fade-in');
+                    } else {
+                        section.classList.add('hidden');
+                        section.classList.remove('fade-in');
+                    }
+                });
+            };
+
+            const highlightLink = (targetId) => {
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href').substring(1) === targetId) {
+                        link.classList.add('bg-blue-600', 'text-white');
+                        link.classList.remove('bg-gray-200', 'text-gray-700');
+                    } else {
+                        link.classList.add('bg-gray-200', 'text-gray-700');
+                        link.classList.remove('bg-blue-600', 'text-white');
+                    }
+                });
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.target.getAttribute('href').substring(1);
+                    showSection(targetId);
+                    highlightLink(targetId);
+                });
+            });
+
+            const renderData = () => {
+                document.getElementById('congregation-name').textContent = visitData.congregation;
+                document.getElementById('circuit-code').textContent = visitData.circuit;
+                document.getElementById('visit-date').textContent = visitData.date;
+                document.getElementById('superintendent-name').textContent = visitData.superintendentName;
+                document.getElementById('motto-text').textContent = visitData.motto;
+
+                const reunionsContainer = document.getElementById('reunions-container');
+                reunionsContainer.innerHTML = '';
+                visitData.reunions.forEach(reunion => {
+                    const li = document.createElement('li');
+                    li.className = "p-4 bg-gray-50 rounded-lg shadow-sm";
+                    
+                    let detailsHTML = reunion.details.map(detail => {
+                        if (detail.includes('<b>')) {
+                            return `<p class="mt-4 font-bold text-gray-800">${detail}</p>`;
+                        } else {
+                            return `<li>${detail}</li>`;
+                        }
+                    }).join('');
+
+                    li.innerHTML = `<h3 class="font-bold text-lg text-blue-700">${reunion.day}</h3>
+                                    <p class="mt-2 font-bold">${reunion.title}</p>
+                                    ${reunion.scripture ? `<p class="mt-1 font-semibold">${reunion.scripture}</p>` : ''}
+                                    <ul class="list-none space-y-1 mt-2">
+                                        ${detailsHTML}
+                                    </ul>`;
+                    reunionsContainer.appendChild(li);
+                });
+
+                const fieldServiceBody = document.getElementById('field-service-body');
+                fieldServiceBody.innerHTML = '';
+                visitData.fieldService.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b text-gray-800";
+                    tr.innerHTML = `<td class="py-2 px-2 text-xs break-words">${item.day}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.time}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.meetingPoint}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.conductor}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.territory}</td>`;
+                    fieldServiceBody.appendChild(tr);
+                });
+
+                const studiesBody = document.getElementById('studies-body');
+                studiesBody.innerHTML = '';
+                visitData.studiesAndRevisits.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b text-gray-800";
+                    tr.innerHTML = `<td class="py-2 px-2 text-xs break-words">${item.day}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.time}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.brother}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.sister}</td>`;
+                    studiesBody.appendChild(tr);
+                });
+
+                const hospitalityBody = document.getElementById('hospitality-body');
+                hospitalityBody.innerHTML = '';
+                visitData.hospitality.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b text-gray-800";
+                    tr.innerHTML = `<td class="py-2 px-2 text-xs break-words">${item.day}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.breakfast}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.lunch}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.dinner}</td>`;
+                    hospitalityBody.appendChild(tr);
+                });
+
+                const additionalBody = document.getElementById('additional-body');
+                additionalBody.innerHTML = '';
+                visitData.additionalMeetings.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b text-gray-800";
+                    tr.innerHTML = `<td class="py-2 px-2 text-xs break-words">${item.day}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.time}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.reunion}</td>
+                                    <td class="py-2 px-2 text-xs break-words">${item.place}</td>`;
+                    additionalBody.appendChild(tr);
+                });
+
+                const remindersList = document.getElementById('reminders-list');
+                remindersList.innerHTML = '';
+                visitData.reminders.forEach(reminder => {
+                    const li = document.createElement('li');
+                    li.textContent = reminder;
+                    li.className = "text-gray-600";
+                    remindersList.appendChild(li);
+                });
+            };
+
+            renderData();
+
+            const defaultSectionId = 'inicio-section';
+            showSection(defaultSectionId);
+            highlightLink(defaultSectionId);
+        };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; 
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .welcome-background {
+            background-image: url('https://storage.googleapis.com/g-user-content/Gemini_Generated_Image_ms9kdams9kdams9k.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: white; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7); 
+            padding: 3rem 1.5rem; 
+            min-height: 250px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.75rem; 
+            overflow: hidden; 
+        }
+        .welcome-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4); 
+            z-index: 1;
+        }
+        .welcome-background > * {
+            position: relative;
+            z-index: 2; 
+        }
+        /* Custom Styles for thinner borders and different section colors */
+        .section-box {
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            border: 1px solid #2563eb; /* Borde azul delgado */
+        }
+        #horario-section .section-box {
+            background-color: #fff;
+        }
+        #servicio-campo-section .section-box {
+            background-color: #f3f4f6;
+        }
+        #programa-hospitalidad-section .section-box {
+            background-color: #ecfdf5;
+        }
+        #reuniones-adicionales-section .section-box {
+            background-color: #fef2f2;
+        }
+        #recordatorios-section .section-box {
+            background-color: #eef2ff;
+        }
+        .table-header {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .table-row {
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 min-h-screen flex flex-col items-center p-4">
+
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl mx-auto flex flex-col items-lg">
+        
+        <header class="w-full text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-800 tracking-tight">VISITA DEL SUPERINTENDENTE DE CIRCUITO</h1>
+            <p class="mt-2 text-lg text-gray-600">Bienvenido a esta semana especial</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center w-full mb-6 gap-2">
+            <a href="#inicio-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Bienvenida</a>
+            <a href="#horario-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Reuniones con la congregación</a>
+            <a href="#servicio-campo-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Servicio del campo</a>
+            <a href="#programa-hospitalidad-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Programa de hospitalidad</a>
+            <a href="#reuniones-adicionales-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Reuniones adicionales</a>
+            <a href="#recordatorios-section" class="px-4 py-2 rounded-full text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors shadow-md text-sm font-medium">Recordatorios</a>
+        </nav>
+
+        <main class="w-full">
+            
+            <section id="inicio-section" class="space-y-6 hidden section-box bg-white">
+                <div class="welcome-background bg-blue-50 p-6 rounded-xl shadow-inner text-center">
+                    <h2 id="congregation-name" class="text-2xl sm:text-3xl font-bold text-white"></h2>
+                    <p id="circuit-code" class="mt-2 text-xl font-medium text-white"></p>
+                    <p id="visit-date" class="mt-2 text-xl font-medium text-white"></p>
+                    <p id="superintendent-name" class="mt-1 text-lg font-medium text-white"></p>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-xl shadow-md text-center text-gray-800">
+                    <p id="motto-text" class="text-xl font-semibold italic"></p>
+                </div>
+                
+                <div class="bg-gray-100 p-6 rounded-xl shadow-md text-gray-800">
+                    <h2 class="text-2xl font-bold">Acerca del Superintendente de Circuito</h2>
+                    <p class="mt-4 leading-relaxed">
+                        El superintendente de circuito es un siervo de Jehová de tiempo completo. Visita varias congregaciones para fortalecer la fe de los hermanos, ayudarles en su servicio, y dar discursos bíblicos. Su visita es una muestra del interés amoroso que la organización de Jehová tiene en cada uno de nosotros.
+                    </p>
+                </div>
+            </section>
+
+            <section id="horario-section" class="space-y-6 hidden section-box">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">REUNIONES CON LA CONGREGACIÓN</h2>
+                    <ul id="reunions-container" class="space-y-4 text-gray-600"></ul>
+                </div>
+            </section>
+            
+            <section id="servicio-campo-section" class="space-y-6 hidden section-box">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">SERVICIO DEL CAMPO</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="table-header">
+                                    <th class="py-2 px-2 text-left text-xs">DÍA</th>
+                                    <th class="py-2 px-2 text-left text-xs">HORA</th>
+                                    <th class="py-2 px-2 text-left text-xs">PUNTO DE REUNIÓN</th>
+                                    <th class="py-2 px-2 text-left text-xs">CONDUCTOR</th>
+                                    <th class="py-2 px-2 text-left text-xs">TERRITORIO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="field-service-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">ESTUDIOS Y REVISITAS (Salón del Reino)</h3>
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="table-header">
+                                    <th class="py-2 px-2 text-left text-xs">DÍA</th>
+                                    <th class="py-2 px-2 text-left text-xs">HORA</th>
+                                    <th class="py-2 px-2 text-left text-xs">CON EL HNO.</th>
+                                    <th class="py-2 px-2 text-left text-xs">CON LA HNA.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studies-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="programa-hospitalidad-section" class="space-y-6 hidden section-box">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">PROGRAMA DE HOSPITALIDAD</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="table-header">
+                                    <th class="py-2 px-2 text-left text-xs">DÍA</th>
+                                    <th class="py-2 px-2 text-left text-xs">DESAYUNO</th>
+                                    <th class="py-2 px-2 text-left text-xs">ALMUERZO</th>
+                                    <th class="py-2 px-2 text-left text-xs">CENA</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hospitality-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reuniones-adicionales-section" class="space-y-6 hidden section-box">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">REUNIONES ADICIONALES</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow-md">
+                            <thead>
+                                <tr class="table-header">
+                                    <th class="py-2 px-2 text-left text-xs">DÍA</th>
+                                    <th class="py-2 px-2 text-left text-xs">HORA</th>
+                                    <th class="py-2 px-2 text-left text-xs">REUNIÓN</th>
+                                    <th class="py-2 px-2 text-left text-xs">LUGAR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="additional-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        
+            <section id="recordatorios-section" class="space-y-6 hidden section-box">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">RECORDATORIOS</h2>
+                    <ul id="reminders-list" class="list-disc list-inside space-y-2 text-gray-600"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
